@@ -1,0 +1,27 @@
+<powershell>
+#Install IIS and custom index.html
+Install-WindowsFeature -name Web-Server -IncludeManagementTools
+Import-Module WebAdministration
+Remove-Item –path c:\inetpub\wwwroot\*
+New-Item -ItemType File -Name 'index.html' -Path 'c:\inetpub\wwwroot\'
+Add-Content -Path c:\inetpub\wwwroot\index.html -Value '<!DOCTYPE html>
+<html>
+    <head>
+         <title>Windows Test Server 2</title>
+    </head>
+    <body>
+    <p>HELLO WORLD from <font color="red">SECOND SERVER</font> of <font color="green">Vitalii Vashkulat</font></p>
+    <h2>Build by Terraform v0.14.5</h2><br>
+    </body>
+</html>'
+New-NetFirewallRule -DisplayName "Allow Port 80" -Direction Inbound -LocalPort 80 -Protocol TCP -Action Allow
+
+#WinRM
+Enable-PSRemoting -force
+Set-Service WinRM -StartMode Automatic
+Get-WmiObject -Class win32_service | Where-Object {$_.name -like "WinRM"}
+
+Set-Item WSMan:localhost\client\trustedhosts -value *
+
+</powershell>
+<persist>true</persist>
